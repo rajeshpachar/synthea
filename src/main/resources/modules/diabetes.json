@@ -1,0 +1,77 @@
+{
+  "name": "Type_2_Diabetes",
+  "remarks": [
+    "This module simulates Type 2 Diabetes for young patients (ages 10-11).",
+    "Adjusted for testing purposes."
+  ],
+  "states": {
+    "Initial": {
+      "type": "Initial",
+      "direct_transition": "Age_Guard"
+    },
+    "Age_Guard": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Age",
+        "operator": ">=",
+        "quantity": 10,
+        "unit": "years"
+      },
+      "direct_transition": "Pre_Diabetes_Risk"
+    },
+    "Pre_Diabetes_Risk": {
+      "type": "Simple",
+      "remarks": ["10% chance of developing diabetes risk"],
+      "distributed_transition": [
+        {
+          "distribution": 0.10,
+          "transition": "Diabetes_Onset"
+        },
+        {
+          "distribution": 0.90,
+          "transition": "Terminal"
+        }
+      ]
+    },
+    "Diabetes_Onset": {
+      "type": "ConditionOnset",
+      "target_encounter": "Diabetes_Diagnosis",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": "44054006",
+          "display": "Type 2 diabetes mellitus"
+        }
+      ],
+      "direct_transition": "Diabetes_Diagnosis"
+    },
+    "Diabetes_Diagnosis": {
+      "type": "Encounter",
+      "encounter_class": "ambulatory",
+      "reason": "Diabetes_Onset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": "5969009",
+          "display": "Diabetes mellitus screening"
+        }
+      ],
+      "direct_transition": "Metformin_Treatment"
+    },
+    "Metformin_Treatment": {
+      "type": "MedicationOrder",
+      "target_encounter": "Diabetes_Diagnosis",
+      "codes": [
+        {
+          "system": "RxNorm",
+          "code": "6809",
+          "display": "Metformin"
+        }
+      ],
+      "direct_transition": "Terminal"
+    },
+    "Terminal": {
+      "type": "Terminal"
+    }
+  }
+}
